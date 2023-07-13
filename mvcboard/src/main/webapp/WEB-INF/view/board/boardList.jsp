@@ -4,7 +4,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>SpringBoard</title>
+<title>우리들의 전국일주</title>
+<link href="/img/favicon.png" rel="icon">
 </head>
 <body>
 	<h1>게시판</h1>

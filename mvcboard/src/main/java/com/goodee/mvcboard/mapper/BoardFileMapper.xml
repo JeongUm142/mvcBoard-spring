@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.goodee.mvcboard.mapper.BoardFileMapper">
+	<!-- 리스트 출력 -->
+	<select id="selectBoardfile"
+		 	parameterType="int">
+		SELECT save_filename saveFilename 
+		FROM boardfile
+		WHERE board_no = #{boardNo}
+	</select>
+	
+	<!-- 추가 -->
+	<insert id="insertBoardfile"
+			parameterType="com.goodee.mvcboard.vo.Boardfile">
+		INSERT INTO boardfile(
+			board_no,
+			origin_filename,
+			save_filename,
+			filetype,
+			filesize
+		) VALUES (
+			#{boardNo},
+			#{originFilename},
+			#{saveFilename},
+			#{filetype},
+			#{filesize}
+		)
+	</insert>
+	
+	<update id="updateBoardfile"
+			parameterType="com.goodee.mvcboard.vo.Boardfile">
+		UPDATE boardfile 
+		SET 
+			
+	</update>
+	
+	<delete id="deletBoardfile"
+			parameterType="int">
+		DELETE FROM boardfile
+		WHERE board_no = #{boardNo}
+	</delete>
+	
+
+</mapper>

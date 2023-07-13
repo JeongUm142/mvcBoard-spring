@@ -4,7 +4,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>SpringBoard</title>
+<title>우리들의 전국일주</title>
+<link href="/img/favicon.png" rel="icon">
 </head>
 <body>
 	<h1>상세보기</h1>
@@ -34,6 +35,27 @@
 						${b.memberId}
 					</td>
 				</tr>
+				<tr>
+					<th>작성일</th>
+					<td>
+						${b.createdate}
+					</td>
+				</tr>
+				<tr>
+					<th>수정일</th>
+					<td>
+						${b.updatedate}
+					</td>
+				</tr>
+				<tr>
+					<th>이미지</th>
+					<c:forEach var="i" items="${boardfile}">
+						<td>
+							<img src="/upload/${i.saveFilename}">
+						</td>
+					</c:forEach>
+				</tr>
+				
 	</table>
 	<a href="/board/modifyBoard?boardNo=${b.boardNo}">수정</a>
 	<a href="/board/removeBoard?boardNo=${b.boardNo}">삭제</a>

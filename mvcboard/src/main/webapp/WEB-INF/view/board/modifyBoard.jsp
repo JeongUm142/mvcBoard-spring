@@ -4,7 +4,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>SpringBoard</title>
+<title>우리들의 전국일주</title>
+<link href="/img/favicon.png" rel="icon">
 </head>
 <body>
 	<h1>게시물수정</h1>
@@ -44,6 +45,12 @@
 					<th>작성자 확인</th>
 					<td>
 						<input type="text" name="memberId" placeholder="작성자를 입력해주세요">
+					</td>
+				</tr>
+				<tr>
+					<th>파일 추가</th>
+					<td>
+						<input type="file" name="originFilename" required="required">
 					</td>
 				</tr>
 		</table>

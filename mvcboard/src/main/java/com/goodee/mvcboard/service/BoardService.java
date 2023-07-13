@@ -1,15 +1,21 @@
 package com.goodee.mvcboard.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.goodee.mvcboard.mapper.BoardFileMapper;
 import com.goodee.mvcboard.mapper.BoardMapper;
 import com.goodee.mvcboard.vo.Board;
+import com.goodee.mvcboard.vo.Boardfile;
 
 @Service
 @Transactional
@@ -17,6 +23,9 @@ public class BoardService {
 	// 자료구조 필터링, DAO
 	@Autowired 
 	private BoardMapper boardMapper;
+	
+	@Autowired 
+	private BoardFileMapper boardfileMapper;
 	
 	// 리스트
 	public Map<String, Object> getBoardList(int currentPage, int rowPerPage, String localName){
@@ -59,6 +68,10 @@ public class BoardService {
 		
 		return map;
 	}
+	// 상품이미지출력 
+	public List<Boardfile> selectBoardfile(int boardNo) {
+		return boardfileMapper.selectBoardfile(boardNo);
+	}
 	
 	// 상세보기
 	public Board boardOne(Board board) {
@@ -66,13 +79,48 @@ public class BoardService {
 	}
 	
 	// 추가
-	public int addBoard(Board board) {
-		board.getLocalName();
-		board.getBoardTitle();
-		board.getBoardContent();
-		board.getMemberId();
-		
-		return boardMapper.insertBoard(board);
+	public int addBoard(Board board, String path) {
+		int row = boardMapper.insertBoard(board);
+
+		// board입력 성공 && 첨부된 파일이 1개 이상 있다면
+		List<MultipartFile> fileList = board.getMultipartFile();
+		if(row == 1 && fileList != null) {
+			int boardNo = board.getBoardNo(); // row보다 늦게 호출되어야 함
+			
+			for(MultipartFile mf : fileList) {// 첨부된 파일의 수만큼 반복
+				if (mf.getSize() > 0) {
+					Boardfile bf = new Boardfile();
+					bf.setBoardNo(boardNo); // 부모 키값
+					bf.setFilesize(mf.getSize()); // 파일 사이즈
+					bf.setFiletype(mf.getContentType()); // 파일 타입(MIME를 사용해서 텍스트로 변환)
+					bf.setOriginFilename(mf.getOriginalFilename()); // 파일 원본 이름
+					// 저장될 파일 이름
+					// 확장자
+					String ext = mf.getOriginalFilename().substring(mf.getOriginalFilename().lastIndexOf("."));
+					// 새로운 이름 + 확장자
+					bf.setSaveFilename(UUID.randomUUID().toString().replace("-", "") + ext);
+					
+					// 테이블의 저장
+					boardfileMapper.insertBoardfile(bf);
+					
+					// 파일 저장(저장위치 -> path변수 안에)
+					// path위치에 저장파일이름으로 빈파일을 생성
+					File f = new File(path + bf.getSaveFilename()); 
+					 
+					// 빈파일에 첨부된 파일의 스트림을 주입
+					try {
+						mf.transferTo(f);
+					} catch (IllegalStateException | IOException e) {
+						// 이럴경우 예의가 먹힘 -> 트랜젝션처리가 안됨
+						e.printStackTrace();
+						
+						// 그래서 try...catch를 강요하지 않는 다른 예외발생 -> runtime...
+						throw new RuntimeException();
+					}
+				}
+			}
+		}
+		return row;
 	}
 		
 	// 수정
@@ -81,8 +129,22 @@ public class BoardService {
 	}
 	
 	// 삭제
-	public int deleteBoard(Board board) {
-		return boardMapper.deleteBoard(board);
+	public int deleteBoard(Board board, String path) {
+		List<Boardfile> selectBoardfile = boardfileMapper.selectBoardfile(board.getBoardNo());
+		
+		if(selectBoardfile != null) {
+			for(Boardfile bf : selectBoardfile) {// 첨부된 파일의 수만큼 반복
+				File f = new File(path + bf.getSaveFilename());
+				if(f.exists()) {
+					f.delete();
+				}
+			}
+		}
+		int row = boardfileMapper.deletBoardfile(board.getBoardNo());
+		
+		row = boardMapper.deleteBoard(board);
+			
+		return row;
 	}
 	
 }

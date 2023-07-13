@@ -55,6 +55,10 @@
 	<!-- 게시글 추가 -->
 	<insert id="insertBoard" 
 			parameterType="com.goodee.mvcboard.vo.Board">
+		<!-- insert하고 나서(boardNo가 비어있음) set을 호출하여 저장 / keyProperty - 필드명 -->
+		<selectKey order="AFTER" keyProperty="boardNo" resultType="int">
+			SELECT last_insert_id()
+		</selectKey>
 		INSERT INTO board(
 			local_name,
 			board_title,
@@ -87,7 +91,7 @@
 	<!-- 게시글 삭제 -->
 	<delete id="deleteBoard">
 		DELETE FROM board
-		WHERE board_no = ${boardNo}
-		AND member_id = ${memberId}
+		WHERE board_no = #{boardNo}
+		AND member_id = #{memberId}
 	</delete>
 </mapper>

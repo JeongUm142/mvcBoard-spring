@@ -4,17 +4,18 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>SpringBoard</title>
+<title>우리들의 전국일주</title>
+<link href="/img/favicon.png" rel="icon">
 </head>
 <body>
 	<h1>게시물삭제</h1>
 	<c:set var="b" value="${board}"></c:set>
-	<form action="/board/modifyBoard" method="post">
+	<form action="/board/removeBoard" method="post">
 		<input type="hidden" name="boardNo" value="${b.boardNo}">
 		<table>
 				<tr>
 					<th>지역명</th>
-					<td><input type="text" name="boardTitle" value="${b.localName}" readonly="readonly"></td>
+					<td><input type="text" name="localName" value="${b.localName}" readonly="readonly"></td>
 				</tr>
 				<tr>	
 					<th>제목</th>

@@ -1,6 +1,9 @@
 package com.goodee.mvcboard.controller;
 
+import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.goodee.mvcboard.service.BoardService;
 import com.goodee.mvcboard.vo.Board;
+import com.goodee.mvcboard.vo.Boardfile;
 
 import lombok.extern.slf4j.Slf4j;
        
@@ -19,26 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 public class BoardController {
 	@Autowired
 	private BoardService boardService;
+	String yellow = "\u001B[33m";
+	String reset = "\u001B[0m";
 	
-	/*
-    ANSI_RESET = "\u001B[0m";
-    ANSI_BLACK = "\u001B[30m";
-    ANSI_RED = "\u001B[31m";
-    ANSI_GREEN = "\u001B[32m";
-    ANSI_YELLOW = "\u001B[33m";
-    ANSI_BLUE = "\u001B[34m";
-    ANSI_PURPLE = "\u001B[35m";
-    ANSI_CYAN = "\u001B[36m";
-    ANSI_WHITE = "\u001B[37m";
-    ANSI_BLACK_BACKGROUND = "\u001B[40m";
-    ANSI_RED_BACKGROUND = "\u001B[41m";
-    ANSI_GREEN_BACKGROUND = "\u001B[42m";
-    ANSI_YELLOW_BACKGROUND = "\u001B[43m";
-    ANSI_BLUE_BACKGROUND = "\u001B[44m";
-    ANSI_PURPLE_BACKGROUND = "\u001B[45m";
-    ANSI_CYAN_BACKGROUND = "\u001B[46m";
-    ANSI_WHITE_BACKGROUND = "\u001B[47m";
-    */
 	// 전체리스트 
 	@GetMapping("/board/boardList")
 	public String boardList(Model model, 
@@ -48,7 +35,7 @@ public class BoardController {
 															// required는 기본 = ture
 							@RequestParam(name = "localName", required = false) String localName) {
 		
-		System.out.println("\u001B[33m" + "localName :" + localName + "\u001B[0m"); // 색상추가
+		System.out.println(yellow + "localName :" + localName + reset); // 색상추가
 		
 		Map<String, Object> resultMap = boardService.getBoardList(currentPage, rowPerPage, localName);
 		
@@ -72,8 +59,11 @@ public class BoardController {
 		board.setBoardNo(boardNo);
 		board = boardService.boardOne(board);
 		
+		List<Boardfile> boardfile = boardService.selectBoardfile(boardNo);
+		
 		// 뷰로 전달
 		model.addAttribute("board", board);
+		model.addAttribute("boardfile", boardfile);
 		
 		return "board/boardOne";
 	}
@@ -91,9 +81,12 @@ public class BoardController {
 	
 	// 추가 액션
 	@PostMapping("/board/addBoard")
-	public String addBoard(Board board) {
-		int row = boardService.addBoard(board);
-		log.debug("\u001B[32m" + "row:" + row + "\u001B[0m"); // 색상추가
+	public String addBoard(HttpServletRequest request, Board board) { // requestAPI를 직접 호출하기 위해서 request 객체를 받는다 
+		String path = request.getServletContext().getRealPath("/upload/");
+		int row = boardService.addBoard(board, path);
+		
+		log.debug(yellow + "row:" + row + reset); // 색상추가
+		
 		return "redirect:/board/boardList";
 		// redirect로 시작하지 않으면 redirectDispath로 포워드도 함께 전달
 	}
@@ -130,7 +123,7 @@ public class BoardController {
 		board.setMemberId(memberId);
 		
 		int row = boardService.modifyBoard(board);
-		log.debug("\u001B[32m" + "수정 row:" + row + "\u001B[0m"); // 색상추가
+		log.debug(yellow+ "수정 row:" + row + reset); // 색상추가
 		
 		return "redirect:/board/boardOne?boardNo=" + boardNo;
 		// redirect로 시작하지 않으면 redirectDispath로 포워드도 함께 전달
@@ -149,17 +142,22 @@ public class BoardController {
 		
 		return "board/removeBoard";
 	}
+	
 	// 삭제 액션
 	@PostMapping("/board/removeBoard")
-	public String removeBoard(@RequestParam(name="boardNo") int boardNo,
+	public String removeBoard(HttpServletRequest request,
+								@RequestParam(name="boardNo") int boardNo,
+								@RequestParam(name="localName") String localName,
 								@RequestParam(name="memberId") String memberId) {
+		String path = request.getServletContext().getRealPath("/upload/");
 		
 		Board board = new Board();
 		board.setBoardNo(boardNo);
+		board.setLocalName(localName);
 		board.setMemberId(memberId);
-		
-		int row = boardService.deleteBoard(board);
-		log.debug("\u001B[32m" + "삭제 row:" + row + "\u001B[0m"); // 색상추가
+			
+		int row = boardService.deleteBoard(board ,path);
+		log.debug(yellow + "삭제 row:" + row + reset); // 색상추가
 		
 		return "redirect:/board/boardList";
 	}	
