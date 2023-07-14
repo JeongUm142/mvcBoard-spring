@@ -10,6 +10,10 @@
 <body>
 	<h1>게시판</h1>
 	<div>
+		<a href="/board/addBoard">게시물 추가</a> 
+	</div>
+	<br>
+	<div>
 		<c:forEach var="m" items="${localNameList}">
 			<a href="/board/boardList?localName=${m.localName}">${m.localName}(${m.cnt})</a>
 		</c:forEach>
@@ -30,9 +34,6 @@
 			</tr>
 		</c:forEach>
 	</table>
-	<div>
-		<a href="/board/addBoard">추가</a>
-	</div>
 	<div>	
 	<br>
 		<c:if test="${currentPage > 1}">

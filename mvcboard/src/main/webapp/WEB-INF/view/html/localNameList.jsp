@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
+	<meta charset="UTF-8">
 	<title>우리들의 전국일주</title>
 	<link href="/img/favicon.png" rel="icon">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
@@ -23,6 +23,11 @@
 					// 백엔드 모델을 프론트 모델로 변경
 					// model -> {'model' : [{localName:'부산'}, {cnt:10},...]}
 					model.forEach(function(item, index) { // 문법으로 foreach 만들 때는 for(in)
+						$('#target').append('<tr>');
+						$('#target').append('<td>' + item.localName + '</td>');
+						$('#target').append('<td>' + item.cnt + '</td>');
+						$('#target').append('</tr>');
+						
 						// chart모델 생성
 						x.push(item.localName);
 						y.push(item.cnt);
@@ -56,10 +61,17 @@
 	</script>
 </head>
 <body>
-	<h1>HOME</h1>
-	<div>
-		<a href="/board/boardList">게시판</a>
-	</div>
+	<h1>Ajax API사용으로 local</h1>
+	<table>
+		<thead>
+			<tr>
+				<th>이름</th>
+				<th>게시글수</th>
+			</tr>
+		</thead>
+		<tbody id="target">
+		</tbody>
+	</table>
 	<canvas id="target2" style="width:150px; max-width:700px"></canvas>
 </body>
 </html>

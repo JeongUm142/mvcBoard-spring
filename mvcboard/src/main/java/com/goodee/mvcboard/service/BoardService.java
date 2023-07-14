@@ -27,6 +27,11 @@ public class BoardService {
 	@Autowired 
 	private BoardFileMapper boardfileMapper;
 	
+	// rest api chart 그래프 호출
+	public List<Map<String, Object>> getLocalNameList(){
+		return boardMapper.selectLocalNameList();
+	}
+	
 	// 리스트
 	public Map<String, Object> getBoardList(int currentPage, int rowPerPage, String localName){
 		// 서비스 레이어 역할 1) 컨트롤러가 넘겨준 서비스가 가진 값을 DAO의 매개값에 맞게 가공
